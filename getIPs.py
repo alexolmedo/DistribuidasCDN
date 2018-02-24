@@ -2,6 +2,7 @@ import socket
 import fcntl
 import struct
 from netaddr import IPAddress, IPNetwork
+import signal
 
 #Obtener IP local
 iface = "wlp3s0"
@@ -16,6 +17,25 @@ subnetMask = str (IPAddress(socket.inet_ntoa(fcntl.ioctl(socket.socket(socket.AF
 print subnetMask
 
 #Obtener lista de hosts de la subnet actual
+listaIPs = []
 for ip in IPNetwork(ipLocal + "/" + subnetMask):
-    print '%s' % ip
+    listaIPs.append('%s' % ip)
+
+#print listaIPs
+
+
+#now connect to the web server on port 80
+# - the normal http port
+for ip in listaIPs:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.01)
+        s.connect((ip, 8999))
+        print ip, 'Se conecto exitosamente'
+        pass
+    except :
+        #print ip, 'No esta disponible'
+        pass
+    
+
 
