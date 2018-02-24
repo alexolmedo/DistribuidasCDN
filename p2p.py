@@ -50,6 +50,7 @@ class GetNodes():
             
         #listaIPValidas.remove(ipLocal) 
         listaIPs.remove(ipLocal)
+        listaIPValidas = listaIPs
         #print listaIPs
         
 
@@ -111,7 +112,9 @@ class Client(threading.Thread):
         salir = ""
         GetNodes()
         for nodo in listaIPValidas:
+
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print nodo
             try:
                 host = nodo
                 port = 8999
