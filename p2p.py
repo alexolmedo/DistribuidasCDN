@@ -50,8 +50,10 @@ class GetNodes():
             
         #listaIPValidas.remove(ipLocal) 
         listaIPs.remove(ipLocal)
-        listaIPValidas = listaIPs
         #print listaIPs
+        global listaIPValidas 
+        listaIPValidas = listaIPs
+        #print listaIPValidas
         
 
 
@@ -111,22 +113,26 @@ class Client(threading.Thread):
         lista = []
         salir = ""
         GetNodes()
+        print listaIPValidas
         for nodo in listaIPValidas:
 
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
             print nodo
             try:
                 host = nodo
                 port = 8999
-            except EOFError:
-                print "Error"
-                return 1
 
-            print "Connecting\n"
-            self.connect(host, port)
-            lista.append(self.sock)
-            print "Connected\n"
+                #print "Connecting\n"
+            	self.settimeout(0.01)
+            	self.connect(host, port)
+            	lista.append(self.sock)
+            	print "Connected\n"
 
+            except:
+                #print "Error"
+                pass
+            
         while 1:
             print "Waiting for message\n"
             msg = raw_input('>>')
