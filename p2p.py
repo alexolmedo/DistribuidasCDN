@@ -35,20 +35,22 @@ class GetNodes():
 
         #now connect to the web server on port 80
         # - the normal http port
-        for ip in listaIPs:
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(0.01)
-                s.connect((ip, 8999))
+        
+        #for ip in listaIPs:
+         #   try:
+          #      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+           #     s.settimeout(0.01)
+            #    s.connect((ip, 8999))
                 #print ip, 'Se conecto exitosamente'
-                listaIPValidas.append(ip)
-                pass
-            except :
+             #   listaIPValidas.append(ip)
+              #  pass
+            #except :
                 #print ip, 'No esta disponible'
-                pass
+             #   pass
             
-        listaIPValidas.remove(ipLocal) 
-        print listaIPValidas
+        #listaIPValidas.remove(ipLocal) 
+        listaIPs.remove(ipLocal)
+        #print listaIPs
         
 
 
@@ -107,7 +109,7 @@ class Client(threading.Thread):
     def run(self):
         lista = []
         salir = ""
-
+        GetNodes()
         for nodo in listaIPValidas:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
