@@ -83,9 +83,9 @@ class Server(threading.Thread):
                     lista_socket.append(connessione)
                     
                     print "El Cliente [%s, %s] se conecto!" % addr
-                    cli = Client()
+                    #cli = Client()
                     print "Started successfully"
-                    cli.start()
+                    #cli.start()
 
             else:
 
@@ -117,6 +117,7 @@ class Client(threading.Thread):
               
 
         for nodo in listaIPValidas:
+            print nodo
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 host = nodo
