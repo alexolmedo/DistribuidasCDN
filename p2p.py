@@ -5,8 +5,50 @@ import sys
 import time
 import threading
 import select
+import fcntl
+import struct
+from netaddr import IPAddress, IPNetwork
+import signal
+import commands
 
+listaIPValidas = []
 lista_socket = []
+
+class GetNodes():
+    def __init__(self):
+        #Obtener IP local
+        iface = commands.getoutput('ls /sys/class/net | grep wl')
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ipLocal = str(s.getsockname()[0])
+        print ipLocal
+        s.close()
+
+        #Obtener mascara de subnet
+        subnetMask = str (IPAddress(socket.inet_ntoa(fcntl.ioctl(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), 35099, struct.pack('256s', str(iface)))[20:24])).netmask_bits())
+        print subnetMask
+
+        #Obtener lista de hosts de la subnet actual
+        listaIPs = []
+        for ip in IPNetwork(ipLocal + "/" + subnetMask):
+            listaIPs.append('%s' % ip)
+
+        #now connect to the web server on port 80
+        # - the normal http port
+        for ip in listaIPs:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(0.01)
+                s.connect((ip, 8999))
+                #print ip, 'Se conecto exitosamente'
+                listaIPValidas.append(ip)
+                pass
+            except :
+                #print ip, 'No esta disponible'
+                pass
+            
+        print listaIPValidas
+        
 
 
 class Server(threading.Thread):
@@ -14,7 +56,7 @@ class Server(threading.Thread):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print "Server started successfully\n"
         hostname = ''
-        port = 7779
+        port = 8999
         self.sock.bind((hostname, port))
         self.sock.listen(1)
         print "Listening on port %d\n" % port
@@ -57,11 +99,12 @@ class Client(threading.Thread):
     def run(self):
         lista = []
         salir = ""
-        while (salir != "si"):
+
+        for nodo in listaIPValidas:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                host = raw_input("Enter the hostname\n>>")
-                port = int(raw_input("Enter the port\n>>"))
+                host = nodo
+                port = 8999
             except EOFError:
                 print "Error"
                 return 1
@@ -70,7 +113,6 @@ class Client(threading.Thread):
             self.connect(host, port)
             lista.append(self.sock)
             print "Connected\n"
-            salir = raw_input("Quiere salir si, no\n>>")
 
         while 1:
             print "Waiting for message\n"
@@ -87,6 +129,7 @@ class Client(threading.Thread):
 
 
 if __name__ == '__main__':
+    nodosValidos = GetNodes()
     srv = Server()
     srv.daemon = True
     print "Starting server"
