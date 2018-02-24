@@ -37,9 +37,10 @@ class GetNodes(threading.Thread):
 
         #now connect to the web server on port 80
         # - the normal http port
-
-        while True:
-            for ip in listaIPs:
+        global listaIPValidas
+        while True:     
+            print "dsfd"       
+            for ip in listaIPs:            
                 try:
                     if (ip!=ipLocal and not(ip in listaIPValidas)):
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,13 +49,13 @@ class GetNodes(threading.Thread):
                         s.close()
                         #print ip, 'Se conecto exitosamente'
                         listaIPValidas.append(ip)
-                        #listaIPUso.append(ip)
+                        listaIPUso.append(ip)                        
                     pass
                 except:
                     #print ip, 'No esta disponible'
                     pass 
                 pass
-            
+            time.sleep(5)
         #print listaIPValidas
         
 
@@ -74,18 +75,20 @@ class Server(threading.Thread):
 
         while 1:
 
-            lectura, escritura, error_in = select.select(lista_socket, [], [], 0)
+            lectura, escritura, error_in = select.select(lista_socket, [], [], 0)            
 
-            for sock in lectura:
+            for sock in lectura:                
 
                 if sock == self.sock:
                     connessione, addr = self.sock.accept()
                     lista_socket.append(connessione)
                     
                     print "El Cliente [%s, %s] se conecto!" % addr
-                    #cli = Client()
+
+                    global cli 
+                    cli= Client()                    
                     print "Started successfully"
-                    #cli.start()
+                    cli.start()
 
             else:
 
@@ -112,11 +115,10 @@ class Client(threading.Thread):
         print "Sent\n"
 
     def run(self):
-        lista = []
-        salir = ""
-              
+        listaIPUso = listaIPValidas
+        salir = ""            
 
-        for nodo in listaIPValidas:
+        for nodo in listaIPUso:
             print nodo
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
@@ -130,7 +132,7 @@ class Client(threading.Thread):
             self.connect(host, port)
             lista.append(self.sock)
             print nodo  + "Connected\n"
-            listaIPValidas.remove(nodo)
+            listaIPUso.remove(nodo)
 
         while 1:
             print "Waiting for message\n"
@@ -149,14 +151,14 @@ class Client(threading.Thread):
 if __name__ == '__main__':
     
     srv = Server()
-    srv.daemon = True
+    #srv.daemon = True
     print "Starting server"
     srv.start()
     time.sleep(1)
     nod = GetNodes()
     nod.start()
     print "Starting client"
-    cli = Client()
+    #cli = Client()
     print "Started successfully"
-    cli.start()
+    #cli.start()
 
