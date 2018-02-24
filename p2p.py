@@ -35,25 +35,21 @@ class GetNodes():
 
         #now connect to the web server on port 80
         # - the normal http port
-        
-        #for ip in listaIPs:
-         #   try:
-          #      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-           #     s.settimeout(0.01)
-            #    s.connect((ip, 8999))
-                #print ip, 'Se conecto exitosamente'
-             #   listaIPValidas.append(ip)
-              #  pass
-            #except :
+        for ip in listaIPs:
+            try:
+                if (ip!=ipLocal):
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(0.01)
+                    s.connect((ip, 8999))
+                    s.close()
+                    #print ip, 'Se conecto exitosamente'
+                    listaIPValidas.append(ip)
+                pass
+            except :
                 #print ip, 'No esta disponible'
-             #   pass
+                pass
             
-        #listaIPValidas.remove(ipLocal) 
-        listaIPs.remove(ipLocal)
-        #print listaIPs
-        global listaIPValidas 
-        listaIPValidas = listaIPs
-        #print listaIPValidas
+        print listaIPValidas
         
 
 
@@ -113,26 +109,21 @@ class Client(threading.Thread):
         lista = []
         salir = ""
         GetNodes()
-        print listaIPValidas
+
         for nodo in listaIPValidas:
-
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-            print nodo
             try:
                 host = nodo
                 port = 8999
+            except EOFError:
+                print "Error"
+                return 1
 
-                #print "Connecting\n"
-            	self.settimeout(0.01)
-            	self.connect(host, port)
-            	lista.append(self.sock)
-            	print "Connected\n"
+            print "Connecting\n"
+            self.connect(host, port)
+            lista.append(self.sock)
+            print "Connected\n"
 
-            except:
-                #print "Error"
-                pass
-            
         while 1:
             print "Waiting for message\n"
             msg = raw_input('>>')
