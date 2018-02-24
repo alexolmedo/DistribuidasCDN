@@ -10,6 +10,7 @@ import struct
 from netaddr import IPAddress, IPNetwork
 import signal
 import commands
+import re
 
 listaIPValidas = []
 listaIPUso = []
@@ -81,25 +82,26 @@ class Server(threading.Thread):
 
                 if sock == self.sock:
                     connessione, addr = self.sock.accept()
-                    lista_socket.append(connessione)
-                    
-                    print "El Cliente [%s, %s] se conecto!" % addr
+                    lista_socket.append(connessione)                    
 
+                    print "El Cliente [%s, %s] se conecto!" % addr                                
                     global cli 
                     cli= Client()                    
                     print "Started successfully"
                     cli.start()
-
+                    
             else:
 
                 try:
                     data = sock.recv(4096)
                     if data:
                         print "[" + str(sock.getpeername()) + "]" + " > " + data
+
                     else:
-                        if sock in lista_socket:
+                        if sock in lista_socket:                            
                             lista_socket.remove(sock)
-                except:
+                            
+                except:                    
                     continue
         self.sock.close()
 
@@ -115,11 +117,10 @@ class Client(threading.Thread):
         print "Sent\n"
 
     def run(self):
-        listaIPUso = listaIPValidas
+        lista = []
         salir = ""            
 
-        for nodo in listaIPUso:
-            print nodo
+        for nodo in listaIPUso:            
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 host = nodo
@@ -131,12 +132,13 @@ class Client(threading.Thread):
             #print "Connecting\n"
             self.connect(host, port)
             lista.append(self.sock)
-            print nodo  + "Connected\n"
+            print nodo  + " Connected\n"
             listaIPUso.remove(nodo)
 
         while 1:
             print "Waiting for message\n"
             msg = raw_input('>>')
+            print msg
             if msg == 'exit':
                 break
             if msg == '':
