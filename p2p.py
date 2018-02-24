@@ -47,6 +47,7 @@ class GetNodes():
                 #print ip, 'No esta disponible'
                 pass
             
+        listaIPValidas.remove(ipLocal) 
         print listaIPValidas
         
 
@@ -73,7 +74,12 @@ class Server(threading.Thread):
                 if sock == self.sock:
                     connessione, addr = self.sock.accept()
                     lista_socket.append(connessione)
+                    
                     print "El Cliente [%s, %s] se conecto!" % addr
+                    cli = Client()
+                    print "Started successfully"
+                    cli.start()
+
             else:
 
                 try:
@@ -89,6 +95,8 @@ class Server(threading.Thread):
 
 
 class Client(threading.Thread):
+
+
     def connect(self, host, port):  # Sobrecarga de metodos
         self.sock.connect((host, port))
 
@@ -129,7 +137,7 @@ class Client(threading.Thread):
 
 
 if __name__ == '__main__':
-    nodosValidos = GetNodes()
+    
     srv = Server()
     srv.daemon = True
     print "Starting server"
