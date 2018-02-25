@@ -20,7 +20,6 @@ class GetNodes(threading.Thread):
 
     def run(self):
         #Obtener IP local
-        iface = commands.getoutput('ls /sys/class/net | grep wl')
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         ipLocal = str(s.getsockname()[0])
@@ -28,7 +27,14 @@ class GetNodes(threading.Thread):
         s.close()
 
         #Obtener mascara de subnet
-        subnetMask = str (IPAddress(socket.inet_ntoa(fcntl.ioctl(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), 35099, struct.pack('256s', str(iface)))[20:24])).netmask_bits())
+        try:
+            iface = commands.getoutput('ls /sys/class/net | grep wl')
+            subnetMask = str (IPAddress(socket.inet_ntoa(fcntl.ioctl(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), 35099, struct.pack('256s', str(iface)))[20:24])).netmask_bits())
+            pass
+        except IOError as e:
+            iface = commands.getoutput('ls /sys/class/net | grep ens')
+            subnetMask = str (IPAddress(socket.inet_ntoa(fcntl.ioctl(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), 35099, struct.pack('256s', str(iface)))[20:24])).netmask_bits())
+            pass
         print subnetMask
 
         #Obtener lista de hosts de la subnet actual
@@ -39,8 +45,7 @@ class GetNodes(threading.Thread):
         #now connect to the web server on port 80
         # - the normal http port
         global listaIPValidas
-        while True:     
-            print "dsfd"       
+        while True:          
             for ip in listaIPs:            
                 try:
                     if (ip!=ipLocal and not(ip in listaIPValidas)):
