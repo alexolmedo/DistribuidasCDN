@@ -111,7 +111,7 @@ class Server(threading.Thread):
                                     bytesToSend = f.read(1024)
                                     sock.send(bytesToSend)#4. Envia Sincronizacion Total
                         elif userResponse1 == 'E':
-                        	sock.recv(1024)#3.Recibe Confirmacion
+                            sock.recv(1024)#3.Recibe Confirmacion
                             os.system('rm ' + filedir)
                             sock.send(filedir, ' Eliminado!!')#3. Envia Eliminado
 
@@ -126,7 +126,7 @@ class Server(threading.Thread):
                                     bytesToSend = f.read(1024)
                                     sock.send(bytesToSend)#4. Envia Sincronizacion Total
                         elif userResponse1 == 'E':
-                        	sock.recv(1024)#3.Recibe Confirmacion
+                            sock.recv(1024)#3.Recibe Confirmacion
                             os.system('rm ' + filedir)
                             sock.send(filedir, ' Eliminado!!')#3. Envia Eliminado
 
